@@ -26,7 +26,7 @@ public class PasswordController {
 
     // Admin requests password reset (Info message for now)
     @PostMapping("/request-reset")
-    @PreAuthorize("hasRole('ADMIN')") // Only Admin can request
+    //@PreAuthorize("hasRole('ADMIN','USER')") // Only Admin can request
     public String requestReset(@RequestParam String username) {
         // In a real project, this would create a request record to the DB
         return "Reset password requested for user: " + username + ". Waiting for Super Admin to reset.";
@@ -38,7 +38,6 @@ public class PasswordController {
     public String resetPassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
         // Get the username from the PasswordChangeRequest object
         String username = passwordChangeRequest.getUsername();
-
         // Find user by username
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (!userOptional.isPresent()) {

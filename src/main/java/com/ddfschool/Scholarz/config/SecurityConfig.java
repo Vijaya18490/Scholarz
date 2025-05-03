@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll() // Only login is public
                         .requestMatchers("/api/auth/signup/**").hasRole("SUPER_ADMIN") // Signup needs SUPER_ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Admin-specific endpoints
-                        .requestMatchers("/api/password/**").hasRole("SUPER_ADMIN") // Securing the password API for SUPER_ADMIN
+                        .requestMatchers("/api/password/reset").hasRole("SUPER_ADMIN") // Securing the password API for SUPER_ADMIN
                         .requestMatchers("/h2-console/**").permitAll() // Allow H2 console access
                         .requestMatchers("/favicon.ico", "/error").permitAll() // Allow favicon and error page
                         .anyRequest().authenticated() // All other endpoints require authentication

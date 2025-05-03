@@ -1,5 +1,8 @@
 package com.ddfschool.Scholarz.service;
 
+import com.ddfschool.Scholarz.exception.RoleNotFoundException;
+import com.ddfschool.Scholarz.exception.SuperAdminAlreadyExistsException;
+import com.ddfschool.Scholarz.exception.UserNotFoundException;
 import com.ddfschool.Scholarz.model.ERole;
 import com.ddfschool.Scholarz.model.Role;
 import com.ddfschool.Scholarz.model.User;
@@ -24,7 +27,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Register user and enforce only one SUPER_ADMIN
     public User registerUser(User user) {
         boolean isSuperAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().name().equals("ROLE_SUPER_ADMIN"));
@@ -37,7 +39,7 @@ public class UserService {
                     );
 
             if (superAdminExists) {
-                throw new RuntimeException("Only one SUPER_ADMIN is allowed in the system.");
+                throw new SuperAdminAlreadyExistsException("Only one SUPER_ADMIN is allowed in the system.");
             }
         }
 
@@ -45,22 +47,24 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Convert role strings (from signup) to Role entities
     public Set<Role> convertRoleStringsToRoles(Set<String> roleStrings) {
         Set<Role> roles = new HashSet<>();
-
         for (String roleStr : roleStrings) {
-            ERole erole = ERole.valueOf(roleStr);
-            Role role = roleRepository.findByName(erole)
-                    .orElseThrow(() -> new RuntimeException("Error: Role not found: " + roleStr));
-            roles.add(role);
+            try {
+                ERole erole = ERole.valueOf(roleStr);
+                Role role = roleRepository.findByName(erole)
+                        .orElseThrow(() -> new
+                                RoleNotFoundException("Role not found: " + roleStr));
+                roles.add(role);
+            } catch (IllegalArgumentException e) {
+                throw new RoleNotFoundException("Invalid role value: " + roleStr);
+            }
         }
-
         return roles;
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
     }
 }

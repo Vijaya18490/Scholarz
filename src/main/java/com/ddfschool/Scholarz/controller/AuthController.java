@@ -56,18 +56,15 @@ public class AuthController {
     @PostMapping("/signup")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<String> signup(@RequestBody SignupRequest signupRequest) {
-        try {
-            User user = new User();
-            user.setFirstName(signupRequest.getFirstName());
-            user.setLastName(signupRequest.getLastName());
-            user.setUsername(signupRequest.getUsername());
-            user.setPassword(signupRequest.getPassword());  // Password will be hashed in service
-            user.setRoles(userService.convertRoleStringsToRoles(signupRequest.getRoles()));
+        User user = new User();
+        user.setFirstName(signupRequest.getFirstName());
+        user.setLastName(signupRequest.getLastName());
+        user.setUsername(signupRequest.getUsername());
+        user.setPassword(signupRequest.getPassword());  // Will be encoded
+        user.setRoles(userService.convertRoleStringsToRoles(signupRequest.getRoles()));
 
-            userService.registerUser(user);
-            return ResponseEntity.ok("User registered successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Error: " + e.getMessage());
-        }
+        userService.registerUser(user);
+        return ResponseEntity.ok("User registered successfully!");
     }
+
 }
